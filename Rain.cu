@@ -34,9 +34,9 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   return new_end.first();
 }
 
-struct in_site
+/*struct in_site
   {
-    const unsigned int site:
+    const unsigned int site;
     in_site(unsigned int _site) : site(_site) {}
     
     //template<typename Tuple>
@@ -45,8 +45,28 @@ struct in_site
     {
       return (x % 2) == 0;
     }
-  };
+  };*/
+
+struct zero_if_not_site : thrust::unary_fuction<IteratorTuple,IteratorTuple>
+{
+    const unsigned int site;
+    zero_if_not_site(unsigned int _site) : site(_site) {}
+    
+    __host__ __device__ IteratorTuple operator()(const IteratorTuple &x) const
+    {
+      return thrust::get<1>(x) == site ? x : (IteratorTuple) thrust::make_tuple(thrust::get<1>(x),0);
+    }
+}
+struct add_tuple_value : thrust::binary_function<IteratorTuple,IteratorTuple,int>
+{
+  const unsigned int site;
+  add_tuple_value_if_site(unsigned int _sit) : site(_site) {}
+  int operator()(const IteratorTuple& x, const IteratorTuple& y)
+  {
+     return thrust::get<2>(x) + thrust::get<2>(y);
+  }
   
+}
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
@@ -56,12 +76,10 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
     typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
     typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
     
-    ZipIterator iter(thrust::make_tuple(S.begin(), M.begin());
-
-    //const int N = sizeof(A)/sizeof(int);
-    IteratorTuple *correct = result;
-    IteratorTuple *wrong  = result + 5;
-    thrust::partition_copy(iter, iter.end(), correct, wrong, in_site(St)); //see 
+    ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
+    //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
+    return thrust::transform_reduce(iter,iter.end(),zero_if_not_site(St),0,add_tuple_value());
+    
   }
 
 unsigned int TotalRainBetween ( thrust::device_vector<unsigned int>& D, 

@@ -31,15 +31,9 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
-  std::cout << std::endl << "Sorted:        "; 
-  thrust::copy( S.begin(), S.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
-  std::cout << std::endl;
   
   new_end = thrust::reduce_by_key(S.begin(), S.end(), G.begin(),K.begin(), D.begin() );
-  
-  std::cout << std::endl << "Reduced:        "; 
-  thrust::copy( K.begin(), K.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
-  std::cout << std::endl;
+
   return new_end.first - K.begin();
 }
 
@@ -73,12 +67,12 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
   {  
     //ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
     //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
-    /*return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
+    return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
                                     thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
                                     zero_if_not_site(St),0,
                                     add_tuple_value()
-                                    );*/
-                                    return 0;
+                                    );
+                                    //return 0;
   }
 
 unsigned int TotalRainBetween ( thrust::device_vector<unsigned int>& D, 

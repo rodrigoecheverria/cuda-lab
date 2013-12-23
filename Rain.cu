@@ -32,7 +32,7 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::sort(S.begin(), S.end());
   thrust::reduce_by_key(S.begin(), S.end(), S.begin(),K.begin(), D.begin() );
   
-  return new_end.first - S;
+  return new_end.first - S.begin();
 }
 
 

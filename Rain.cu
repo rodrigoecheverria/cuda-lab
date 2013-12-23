@@ -40,33 +40,33 @@ typedef thrust::device_vector<int>::iterator   MeasureIt;
 typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
 typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
 
-struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::tuple<int,int>>
+struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::tuple<int,int> >
 {
     const unsigned int site;
     zero_if_not_site(unsigned int _site) : site(_site) {}
     
     __host__ __device__ thrust::tuple<int,int> operator()(const thrust::tuple<int,int> &x) const
     {
-      return thrust::get<1>(x) == site ? x : (IteratorTuple) thrust::make_tuple(thrust::get<1>(x),0);
+      return thrust::get<1>(x) == site ? x : thrust::make_tuple(thrust::get<1>(x),0);
     }
-}
+};
 struct add_tuple_value : thrust::binary_function<IteratorTuple,IteratorTuple,int>
 {
-  const unsigned int site;
-  add_tuple_value_if_site(unsigned int _sit) : site(_site) {}
   int operator()(const IteratorTuple& x, const IteratorTuple& y)
   {
      return thrust::get<2>(x) + thrust::get<2>(y);
   }
   
-}
+};
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
   {  
     ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
     //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
-    return thrust::transform_reduce(iter,iter.end(),zero_if_not_site(St),0,add_tuple_value());
+    return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin()))
+                                    thrust::make_zip_iterator(thrust::make_tuple(S.end(), M.end())),
+                                    zero_if_not_site(St),0,add_tuple_value());
     
   }
 

@@ -37,7 +37,19 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
-  { return 0; }
+  {     
+    typedef thrust::device_vector<int>::iterator   SiteIt;
+    typedef thrust::device_vector<int>::iterator   MeasureIt;
+    typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
+    typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
+    
+    ZipIterator iter(thrust::make_tuple(S.begin(), M.begin());
+
+    //const int N = sizeof(A)/sizeof(int);
+    IteratorTuple *correct = result;
+    IteratorTuple *wrong  = result + 5;
+    thrust::partition_copy(iter, iter.end(), correct, wrong, is_even()); //see 
+  }
 
 unsigned int TotalRainBetween ( thrust::device_vector<unsigned int>& D, 
                                 thrust::device_vector<unsigned int>& M, 

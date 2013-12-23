@@ -31,8 +31,10 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
+  thrust::copy( S.begin(), S.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
   thrust::reduce_by_key(S.begin(), S.end(), G.begin(),K.begin(), D.begin() );
-  
+  thrust::copy( K.begin(), K.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
+  std::cout << std::endl;
   return new_end.first - K.begin();
 }
 
@@ -84,7 +86,7 @@ unsigned int TotalDaysWithRain ( thrust::device_vector<unsigned int>& D) { retur
 unsigned int TotalDaysRainHigher( thrust::device_vector<unsigned int>& D, 
                                   thrust::device_vector<unsigned int>& M, 
                                   const unsigned int Min)
-  { return 0; }
+  { return thrust::count_if() }
 
 
 bool Option ( char o, thrust::device_vector<unsigned int>& Days, 

@@ -52,7 +52,7 @@ struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::
 };
 struct add_tuple_value : thrust::binary_function<thrust::tuple<int,int>,thrust::tuple<int,int>,int>
 {
-  int operator()(const thrust::tuple<int,int>& x, const thrust::tuple<int,int>& y)
+  int operator()(const thrust::tuple<int,int> x, const thrust::tuple<int,int> y)
   {
      return thrust::get<2>(x) + thrust::get<2>(y);
   }

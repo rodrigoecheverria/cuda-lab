@@ -31,7 +31,7 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
   new_end = thrust::reduce_by_key(S.begin(), S.end(), D.begin(),K.begin(), D.begin() );
-  return new_end.first();
+  return new_end.first;
 }
 
 /*struct in_site
@@ -47,7 +47,7 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
     }
   };*/
 
-struct zero_if_not_site : thrust::unary_fuction<IteratorTuple,IteratorTuple>
+struct zero_if_not_site : thrust::unary_function<IteratorTuple,IteratorTuple>
 {
     const unsigned int site;
     zero_if_not_site(unsigned int _site) : site(_site) {}

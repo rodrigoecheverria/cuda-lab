@@ -26,7 +26,9 @@ unsigned int TotalDaysRainInSite ( thrust::device_vector<unsigned int>& S,
 
 unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
 { 
-  thrust::pair<thrust::device_vector<unsigned int>::iterator, thrust::device_vector<unsigned int>::iterator> new_end;
+  thrust::pair<thrust::device_vector<unsigned int>::iterator, 
+  thrust::device_vector<unsigned int>::iterator> new_end;
+  
   thrust::device_vector<unsigned int> G(S.size());
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
@@ -37,60 +39,104 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   return new_end.first - K.begin();
 }
 
+/**
+ * TotalRainIN auxiliar code
+ */
+ 
+///Type definitions
+typedef thrust::tuple<unsigned int, unsigned int> UIntTuple;
 
-typedef thrust::device_vector<int>::iterator   SiteIt;
-typedef thrust::device_vector<int>::iterator   MeasureIt;
-typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
-typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
-
-struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::tuple<int,int> >
+///Map functor
+struct zero_if_not_site : thrust::unary_function<UIntTuple,UIntTuple>
 {
-    const unsigned int site;
-    zero_if_not_site(unsigned int _site) : site(_site) {}
-    
-    __host__ __device__ thrust::tuple<int,int> operator()(const thrust::tuple<int,int> &x) const
-    {
-      return thrust::get<0>(x) == site ? x : thrust::make_tuple(thrust::get<0>(x),0);
-    }
-};
-struct add_tuple_value : thrust::binary_function<thrust::tuple<unsigned int,unsigned int>,thrust::tuple<unsigned int,unsigned int>, thrust::tuple<unsigned int,unsigned int> >
-{
-  thrust::tuple<unsigned int,unsigned int> operator()(const thrust::tuple<unsigned int,unsigned int> &x, const thrust::tuple<unsigned int,unsigned int> &y)
+  const unsigned int site;
+  zero_if_not_site(unsigned int _site) : site(_site) {}
+  __host__ __device__ UIntTuple operator()(const UIntTuple x) const
   {
-     return x;   // thrust::get<1>(x) + thrust::get<1>(y);
+    return (thrust::get<0>(x) == site) ? x : thrust::make_tuple(thrust::get<0>(x), (unsigned int) 0);
   }
-  
+};
+
+///Reduce functor
+struct add_tuple_value : thrust::binary_function<UIntTuple, UIntTuple, UIntTuple>
+{
+  __host__ __device__ UIntTuple operator()(const UIntTuple &x, const UIntTuple &y)
+  {
+    return thrust::make_tuple(thrust::get<0>(x) + thrust::get<0>(y), 
+                              thrust::get<1>(x) + thrust::get<1>(y));
+  }
 };
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
-  {  
-    //ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
-    //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
-    /*return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
-                                    thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
-                                    zero_if_not_site(St),0,
-                                    add_tuple_value()
-                                    );*/
-  return thrust::reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
-                        thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
-                        thrust::make_tuple(0,0),
-                        add_tuple_value()
-                                    );
-                                    //return 0;
+{
+  UIntTuple t = 
+    thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
+                             thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
+                             zero_if_not_site(St),
+                             thrust::make_tuple(0,0),
+                             add_tuple_value());
+  return thrust::get<1>(t);
+}
+
+///Map functor
+struct zero_if_not_period : thrust::unary_function<UIntTuple,UIntTuple>
+{
+  const unsigned int start;
+  const unsigned int end;
+  zero_if_not_period(unsigned int _start, unsigned int _end) : start(_start), end(_end) {}
+  __host__ __device__ UIntTuple operator()(const UIntTuple x) const
+  {
+    return (start <= thrust::get<0>(x) && thrust::get<0>(x) <= end) ? x : thrust::make_tuple(-thrust::get<0>(x), (unsigned int) 0);
   }
+};
 
 unsigned int TotalRainBetween ( thrust::device_vector<unsigned int>& D, 
                                 thrust::device_vector<unsigned int>& M, 
                                 const unsigned int Start, const unsigned int End)
-  { return 0; }
+{ 
+  UIntTuple t = 
+    thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(D.begin(), M.begin())),
+                             thrust::make_zip_iterator(thrust::make_tuple(D.end(),   M.end  ())),
+                             zero_if_not_period(Start, End),
+                             thrust::make_tuple(0,0),
+                             add_tuple_value());
+  return thrust::get<1>(t); 
+}
 
-unsigned int TotalDaysWithRain ( thrust::device_vector<unsigned int>& D) { return 0; }
+unsigned int TotalDaysWithRain ( thrust::device_vector<unsigned int>& D) { 
+  thrust::pair<thrust::device_vector<unsigned int>::iterator, 
+  thrust::device_vector<unsigned int>::iterator> new_end;
+  
+  thrust::device_vector<unsigned int> G(D.size());
+  thrust::device_vector<unsigned int> V(D.size());
+  thrust::device_vector<unsigned int> K(D.size());
+  thrust::sort(D.begin(), D.end());
+  
+  new_end = thrust::reduce_by_key(D.begin(), D.end(), G.begin(),K.begin(), V.begin() );
 
+  return new_end.first - K.begin(); 
+}
+
+///Filter functor
+struct is_higher_than : thrust::unary_function<UIntTuple,UIntTuple>
+{
+  const unsigned int min_threshold;
+  is_higher_than(unsigned int _min_threshold) : min_threshold(_min_threshold) {}
+  
+  __host__ __device__ bool operator()(const UIntTuple x) const
+  {
+    return thrust::get<1>(x) > min_threshold;
+  }
+};
 unsigned int TotalDaysRainHigher( thrust::device_vector<unsigned int>& D, 
                                   thrust::device_vector<unsigned int>& M, 
                                   const unsigned int Min)
-  { return 0;}//thrust::count_if() }
+{ 
+  return thrust::count_if(thrust::make_zip_iterator(thrust::make_tuple(D.begin(), M.begin())),
+                          thrust::make_zip_iterator(thrust::make_tuple(D.end(),   M.end  ())),
+                          is_higher_than(Min)); 
+}
 
 
 bool Option ( char o, thrust::device_vector<unsigned int>& Days, 

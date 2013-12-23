@@ -40,12 +40,12 @@ typedef thrust::device_vector<int>::iterator   MeasureIt;
 typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
 typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
 
-struct zero_if_not_site : thrust::unary_function<IteratorTuple,IteratorTuple>
+struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::tuple<int,int>>
 {
     const unsigned int site;
     zero_if_not_site(unsigned int _site) : site(_site) {}
     
-    __host__ __device__ IteratorTuple operator()(const IteratorTuple &x) const
+    __host__ __device__ thrust::tuple<int,int> operator()(const thrust::tuple<int,int> &x) const
     {
       return thrust::get<1>(x) == site ? x : (IteratorTuple) thrust::make_tuple(thrust::get<1>(x),0);
     }

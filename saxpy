@@ -1,0 +1,95 @@
+master15@aolin20:~/code/cudalab$ nvprof ./sx 50000000
+==12580== NVPROF is profiling process 12580, command: ./sx 50000000
+Saxpy Slow. Sum of Differences is 0
+Saxpy Fast. Sum of Differences is 0
+Saxpy CUDA. Sum of Differences is 0
+==12580== Profiling application: ./sx 50000000
+==12580== Profiling result:
+Time(%)      Time     Calls       Avg       Min       Max  Name
+ 34.65%  110.93ms         3  36.975ms  36.365ms  37.369ms  [CUDA memcpy DtoH]
+ 23.01%  73.663ms         2  36.832ms  36.128ms  37.535ms  [CUDA memcpy HtoD]
+  9.20%  29.457ms         1  29.457ms  29.457ms  29.457ms  saxpy [[[[CUDA KERNEL]]]]
+  9.18%  29.384ms         1  29.384ms  29.384ms  29.384ms  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<saxpy_functor>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)[[[[FAST]]]]
+
+  9.14%  29.258ms         1  29.258ms  29.258ms  29.258ms  void  thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::plus<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)[[[[SLOW]]]]
+  
+9.10%  29.127ms         1  29.127ms  29.127ms  29.127ms  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::multiplies<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)[[[[SLOW]]]]
+
+  5.73%  18.361ms         2  9.1802ms  9.1696ms  9.1909ms  void   thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::device_ptr<__int64>, unsigned int, thrust::detail::device_generate_functor<thrust::de tail::fill_functor<__int64>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(__int64)  [[[[SLOW]]]] one call
+
+===========================================================================================================================================================
+===========================================================================================================================================================
+===========================================================================================================================================================
+
+master15@aolin20:~/code/cudalab$ nvprof --print-gpu-trace ./sx 50000000
+==13791== NVPROF is profiling process 13791, command: ./sx 50000000
+Saxpy Slow. Sum of Differences is 0
+Saxpy Fast. Sum of Differences is 0
+Saxpy CUDA. Sum of Differences is 0
+==13791== Profiling application: ./sx 50000000
+==13791== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+161.17ms  37.163ms                    -               -         -         -         -  200.00MB  5.3817GB/s  GeForce GT 430          1         2  [CUDA memcpy HtoD]
+198.58ms  35.587ms                    -               -         -         -         -  200.00MB  5.6201GB/s  GeForce GT 430          1         2  [CUDA memcpy HtoD]
+297.67ms  9.1832ms              (4 1 1)       (768 1 1)        10        0B        0B         -           -  GeForce GT 430          1         2  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::device_ptr<__int64>, unsigned int, thrust::detail::device_generate_functor<thrust::detail::fill_functor<__int64>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(__int64) [93]
+306.86ms  9.1619ms              (4 1 1)       (768 1 1)        10        0B        0B         -           -  GeForce GT 430          1         2  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::device_ptr<__int64>, unsigned int, thrust::detail::device_generate_functor<thrust::detail::fill_functor<__int64>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(__int64) [99]
+316.02ms  29.140ms              (4 1 1)       (768 1 1)        13        0B        0B         -           -  GeForce GT 430          1         2  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::multiplies<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float) [105]
+345.16ms  29.300ms              (4 1 1)       (768 1 1)        13        0B        0B         -           -  GeForce GT 430          1         2  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::plus<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float) [111]
+374.62ms  37.192ms                    -               -         -         -         -  200.00MB  5.3776GB/s  GeForce GT 430          1         2  [CUDA memcpy DtoH]
+536.43ms  29.441ms              (4 1 1)       (768 1 1)        13        0B        0B         -           -  GeForce GT 430          1         2  void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<saxpy_functor>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float) [119]
+565.88ms  36.909ms                    -               -         -         -         -  200.00MB  5.4187GB/s  GeForce GT 430          1         2  [CUDA memcpy DtoH]
+726.14ms  29.569ms              (6 1 1)       (512 1 1)        12        0B        0B         -           -  GeForce GT 430          1         2  saxpy [126]
+755.72ms  36.360ms                    -               -         -         -         -  200.00MB  5.5006GB/s  GeForce GT 430          1         2  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+
+
+===========================================================================================================================================================
+===========================================================================================================================================================
+===========================================================================================================================================================
+
+master15@aolin20:~/code/cudalab$ nvprof --metrics ipc,flops_sp,inst_executed,l2_read_throughput,dram_read_throughput ./sx 50000000
+==14008== NVPROF is profiling process 14008, command: ./sx 50000000
+==14008== Some kernel(s) will be replayed on device 0 in order to collect all events/metrics.
+Saxpy Slow. Sum of Differences is 0
+Saxpy Fast. Sum of Differences is 0
+Saxpy CUDA. Sum of Differences is 0
+==14008== Profiling application: ./sx 50000000
+==14008== Profiling result:
+==14008== Metric result:
+Invocations                     Metric Name              Metric Description         Min         Max         Avg
+Device "GeForce GT 430 (0)"
+	Kernel: void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::multiplies<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)
+          1                             ipc                    Executed IPC    0.499126    0.499126    0.499126
+          1                        flops_sp                   FLOPS(Single)    50000000    50000000    50000000
+          1                   inst_executed           Instructions Executed    20314324    20314324    20314324
+          1            dram_read_throughput   Device Memory Read Throughput  14.049GB/s  14.049GB/s  14.049GB/s
+          1              l2_read_throughput           L2 Throughput (Reads)  13.733GB/s  13.733GB/s  13.733GB/s
+	Kernel: void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::device_ptr<__int64>, unsigned int, thrust::detail::device_generate_functor<thrust::detail::fill_functor<__int64>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(__int64)
+          2                             ipc                    Executed IPC    0.369678    0.370091    0.369884
+          2                        flops_sp                   FLOPS(Single)           0           0           0
+          2                   inst_executed           Instructions Executed     4689132     4689132     4689132
+          2            dram_read_throughput   Device Memory Read Throughput  304.94MB/s  316.55MB/s  310.75MB/s
+          2              l2_read_throughput           L2 Throughput (Reads)  55.830KB/s  83.725KB/s  69.777KB/s
+	Kernel: void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<thrust::plus<float>>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)
+          1                             ipc                    Executed IPC    0.495872    0.495872    0.495872
+          1                        flops_sp                   FLOPS(Single)    50000000    50000000    50000000
+          1                   inst_executed           Instructions Executed    20314324    20314324    20314324
+          1            dram_read_throughput   Device Memory Read Throughput  13.960GB/s  13.960GB/s  13.960GB/s
+          1              l2_read_throughput           L2 Throughput (Reads)  13.647GB/s  13.647GB/s  13.647GB/s
+	Kernel: saxpy
+          1                             ipc                    Executed IPC    0.436599    0.436599    0.436599
+          1                        flops_sp                   FLOPS(Single)   100000000   100000000   100000000
+          1                   inst_executed           Instructions Executed    17969800    17969800    17969800
+          1            dram_read_throughput   Device Memory Read Throughput  13.892GB/s  13.892GB/s  13.892GB/s
+          1              l2_read_throughput           L2 Throughput (Reads)  13.576GB/s  13.576GB/s  13.576GB/s
+	Kernel: void thrust::system::cuda::detail::detail::launch_closure_by_value<thrust::system::cuda::detail::for_each_n_detail::for_each_n_closure<thrust::zip_iterator<thrust::tuple<thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::detail::normal_iterator<thrust::device_ptr<float>>, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type, thrust::null_type>>, unsigned int, thrust::detail::device_binary_transform_functor<saxpy_functor>, thrust::system::cuda::detail::detail::blocked_thread_array>>(float)
+          1                             ipc                    Executed IPC    0.495292    0.495292    0.495292
+          1                        flops_sp                   FLOPS(Single)   100000000   100000000   100000000
+          1                   inst_executed           Instructions Executed    20314324    20314324    20314324
+          1            dram_read_throughput   Device Memory Read Throughput  13.941GB/s  13.941GB/s  13.941GB/s
+          1              l2_read_throughput           L2 Throughput (Reads)  13.628GB/s  13.628GB/s  13.628GB/s
+master15@aolin20:~/code/cudalab$ 
+

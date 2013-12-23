@@ -86,7 +86,7 @@ unsigned int TotalDaysWithRain ( thrust::device_vector<unsigned int>& D) { retur
 unsigned int TotalDaysRainHigher( thrust::device_vector<unsigned int>& D, 
                                   thrust::device_vector<unsigned int>& M, 
                                   const unsigned int Min)
-  { return thrust::count_if() }
+  { return 0;}//thrust::count_if() }
 
 
 bool Option ( char o, thrust::device_vector<unsigned int>& Days, 

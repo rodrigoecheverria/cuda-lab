@@ -34,6 +34,19 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   return new_end.first();
 }
 
+struct in_site
+  {
+    const unsigned int site:
+    in_site(unsigned int _site) : site(_site) {}
+    
+    //template<typename Tuple>
+    __host__ __device__
+    bool operator()(const Tuple& x)
+    {
+      return (x % 2) == 0;
+    }
+  };
+  
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
@@ -48,7 +61,7 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
     //const int N = sizeof(A)/sizeof(int);
     IteratorTuple *correct = result;
     IteratorTuple *wrong  = result + 5;
-    thrust::partition_copy(iter, iter.end(), correct, wrong, is_even()); //see 
+    thrust::partition_copy(iter, iter.end(), correct, wrong, in_site(St)); //see 
   }
 
 unsigned int TotalRainBetween ( thrust::device_vector<unsigned int>& D, 

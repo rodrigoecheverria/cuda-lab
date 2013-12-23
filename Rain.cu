@@ -31,21 +31,14 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
   new_end = thrust::reduce_by_key(S.begin(), S.end(), D.begin(),K.begin(), D.begin() );
-  return new_end.first;
+  return *(new_end.first);
 }
 
-/*struct in_site
-  {
-    const unsigned int site;
-    in_site(unsigned int _site) : site(_site) {}
-    
-    //template<typename Tuple>
-    __host__ __device__
-    bool operator()(const Tuple& x)
-    {
-      return (x % 2) == 0;
-    }
-  };*/
+
+typedef thrust::device_vector<int>::iterator   SiteIt;
+typedef thrust::device_vector<int>::iterator   MeasureIt;
+typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
+typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
 
 struct zero_if_not_site : thrust::unary_function<IteratorTuple,IteratorTuple>
 {
@@ -70,12 +63,7 @@ struct add_tuple_value : thrust::binary_function<IteratorTuple,IteratorTuple,int
 unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S, 
                            thrust::device_vector<unsigned int>& M, 
                            const unsigned int St)
-  {     
-    typedef thrust::device_vector<int>::iterator   SiteIt;
-    typedef thrust::device_vector<int>::iterator   MeasureIt;
-    typedef thrust::tuple<SiteIt, MeasureIt> IteratorTuple;
-    typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
-    
+  {  
     ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
     //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
     return thrust::transform_reduce(iter,iter.end(),zero_if_not_site(St),0,add_tuple_value());

@@ -74,8 +74,6 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
                                     );*/
   return thrust::reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
                         thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
-                        (unsigned int) 0,
-                        add_tuple_value()
                                     );
                                     //return 0;
   }

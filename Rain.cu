@@ -26,7 +26,7 @@ unsigned int TotalDaysRainInSite ( thrust::device_vector<unsigned int>& S,
 
 unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
 { 
-  thrust::pair<unsigned int, unsigned int> new_end;
+  thrust::pair<unsigned int*, unsigned int*> new_end;
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());

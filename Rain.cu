@@ -26,13 +26,13 @@ unsigned int TotalDaysRainInSite ( thrust::device_vector<unsigned int>& S,
 
 unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
 { 
-  thrust::pair<thrust::device_vector<unsigned int>, thrust::device_vector<unsigned int> > new_end;
+  thrust::pair<thrust::device_vector<unsigned int>::iterator, thrust::device_vector<unsigned int>::iterator> new_end;
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
   thrust::reduce_by_key(S.begin(), S.end(), S.begin(),K.begin(), D.begin() );
-  return 0;
-  //return new_end.first - S;
+  
+  return new_end.first - S;
 }
 
 

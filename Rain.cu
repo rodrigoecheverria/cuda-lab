@@ -53,9 +53,9 @@ struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::
       return thrust::get<0>(x) == site ? x : thrust::make_tuple(thrust::get<0>(x),0);
     }
 };
-struct add_tuple_value : thrust::binary_function<thrust::tuple<int,int>,thrust::tuple<int,int>,int>
+struct add_tuple_value : thrust::binary_function<thrust::tuple<unsigned int,unsigned int>,thrust::tuple<unisgned int, unsigned int>, unsigned int>
 {
-  int operator()(const thrust::tuple<int,int> x, const thrust::tuple<int,int> y)
+  unsigned int operator()(const thrust::tuple<unsigned int,unsigned int> x, const thrust::tuple<unsigned int,unsigned int> y)
   {
      return thrust::get<1>(x) + thrust::get<1>(y);
   }

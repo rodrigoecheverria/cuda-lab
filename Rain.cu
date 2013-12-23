@@ -31,8 +31,13 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::device_vector<unsigned int> D(S.size());
   thrust::device_vector<unsigned int> K(S.size());
   thrust::sort(S.begin(), S.end());
+  std::cout << std::endl << "Sorted:        "; 
   thrust::copy( S.begin(), S.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
+  std::cout << std::endl;
+  
   thrust::reduce_by_key(S.begin(), S.end(), G.begin(),K.begin(), D.begin() );
+  
+  std::cout << std::endl << "Reduced:        "; 
   thrust::copy( K.begin(), K.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
   std::cout << std::endl;
   return new_end.first - K.begin();

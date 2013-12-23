@@ -67,10 +67,15 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
   {  
     //ZipIterator iter(thrust::make_tuple(S.begin(), M.begin()));
     //ZipIterator result = thrust::partition(iter, iter.end(), in_site(St)); //see
-    return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
+    /*return thrust::transform_reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
                                     thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
                                     zero_if_not_site(St),0,
                                     add_tuple_value()
+                                    );*/
+  return thrust::reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
+                        thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
+                        (unsigned int) 0,
+                        add_tuple_value()
                                     );
                                     //return 0;
   }

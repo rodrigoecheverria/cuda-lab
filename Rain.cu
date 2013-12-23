@@ -35,7 +35,7 @@ unsigned int TotalSites ( thrust::device_vector<unsigned int>& S)
   thrust::copy( S.begin(), S.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));
   std::cout << std::endl;
   
-  thrust::reduce_by_key(S.begin(), S.end(), G.begin(),K.begin(), D.begin() );
+  new_end = thrust::reduce_by_key(S.begin(), S.end(), G.begin(),K.begin(), D.begin() );
   
   std::cout << std::endl << "Reduced:        "; 
   thrust::copy( K.begin(), K.end(), std::ostream_iterator<unsigned int>( std::cout, ", " ));

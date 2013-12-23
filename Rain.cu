@@ -47,14 +47,14 @@ struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::
     
     __host__ __device__ thrust::tuple<int,int> operator()(const thrust::tuple<int,int> &x) const
     {
-      return thrust::get<1>(x) == site ? x : thrust::make_tuple(thrust::get<1>(x),0);
+      return thrust::get<0>(x) == site ? x : thrust::make_tuple(thrust::get<0>(x),0);
     }
 };
 struct add_tuple_value : thrust::binary_function<thrust::tuple<int,int>,thrust::tuple<int,int>,int>
 {
   int operator()(const thrust::tuple<int,int> x, const thrust::tuple<int,int> y)
   {
-     return thrust::get<2>(x) + thrust::get<2>(y);
+     return thrust::get<1>(x) + thrust::get<1>(y);
   }
   
 };

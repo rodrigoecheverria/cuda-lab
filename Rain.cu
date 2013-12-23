@@ -53,11 +53,11 @@ struct zero_if_not_site : thrust::unary_function<thrust::tuple<int,int>,thrust::
       return thrust::get<0>(x) == site ? x : thrust::make_tuple(thrust::get<0>(x),0);
     }
 };
-struct add_tuple_value : thrust::binary_function<thrust::tuple<unsigned int,unsigned int>,thrust::tuple<unsigned int,unsigned int>, unsigned int>
+struct add_tuple_value : thrust::binary_function<thrust::tuple<unsigned int,unsigned int>,thrust::tuple<unsigned int,unsigned int>, thrust::tuple<unsigned int,unsigned int>>
 {
-  unsigned int operator()(const thrust::tuple<unsigned int,unsigned int> &x, const thrust::tuple<unsigned int,unsigned int> &y)
+  thrust::tuple<unsigned int,unsigned int> operator()(const thrust::tuple<unsigned int,unsigned int> &x, const thrust::tuple<unsigned int,unsigned int> &y)
   {
-     return thrust::get<1>(x) + thrust::get<1>(y);
+     return x;   // thrust::get<1>(x) + thrust::get<1>(y);
   }
   
 };
@@ -74,7 +74,7 @@ unsigned int TotalRainIN ( thrust::device_vector<unsigned int>& S,
                                     );*/
   return thrust::reduce(thrust::make_zip_iterator(thrust::make_tuple(S.begin(), M.begin())),
                         thrust::make_zip_iterator(thrust::make_tuple(S.end(),   M.end  ())),
-                        (unsigned int) 0,
+                        thrust::make_tuple(0,0),
                         add_tuple_value()
                                     );
                                     //return 0;
